@@ -1,0 +1,24 @@
+{% extends "./baza.html" %}
+{% load static %}
+{% block title %}Eroare 403{% endblock %}
+{% block content %}
+<div>
+    {% if request.user.is_authenticated %}
+        <h2>Salut {{ request.user.username }}</h2>
+    {% else %}
+        <h2>Salut preastimate anonim</h2>
+    {% endif %}
+    {% if titlu %}
+        <h1>{{ titlu }}</h1>
+    {% else %}
+        <h1>Eroare 403</h1>
+    {% endif %}
+    <p>{{ mesaj_personalizat }}</p>
+    <p>Număr total de accesări ale paginilor cu eroare 403 în sesiunea curentă: {{ ghinion_accesari }}</p>
+    {% if ghinion_accesari > N_MAX_403 %}
+        <p style="color:red; font-weight:bold;">
+            Atenție: Ai depășit limita de accesări permise ({{ N_MAX_403 }}).
+        </p>
+    {% endif %}
+</div>
+{% endblock %}

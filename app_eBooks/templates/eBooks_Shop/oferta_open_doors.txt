@@ -1,0 +1,14 @@
+Subiect: {{ subiect }}
+
+Salut!
+
+Va aducem la cunostinca faptul ca oferta Open doors va incepe de pe data de {{start_date}} pe categoriile: {{ categorii_list }}.
+Discount: {{ discount }}%
+
+Expiră pe: {{ data_expirare }}
+
+Info suplimentare:
+{{ detalii }}
+
+Accesează pagina promoției: {{ url_promotie }}
+Spor la cumpărături!

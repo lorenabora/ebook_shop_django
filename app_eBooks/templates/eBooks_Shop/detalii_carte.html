@@ -1,0 +1,167 @@
+{% extends "./baza.html" %}
+{%load static%}
+{% block title %}Detalii carte{% endblock %}
+
+{% block content %}
+<h1>{{ carte.titlu }}</h1>
+<div class="o_carte {% if carte.stoc == 0 %}indisponibil{% endif %}">
+  {% if carte.imagine %}
+    <img src="{{ carte.imagine.url }}" alt="{{ carte.titlu }}">
+  {% else %}
+    <p><em>Nu există imagine disponibilă.</em></p>
+  {% endif %}
+  <div class="detalii_carte">
+    <p><strong>Autor(i):</strong>
+      {% for autor in carte.autor.all %}
+        {{ autor.prenume }} {{ autor.nume }}{% if not forloop.last %}, {% endif %}
+      {% endfor %}
+    </p>
+    <p><strong>Preț:</strong> {{ carte.pret }} lei</p>
+    <p><strong>În stoc:</strong> {{ carte.in_stoc|yesno:"Da,Nu" }}</p>
+    <p>Stoc disponibil: <span class="stoc">{{ carte.stoc }}</span></p>
+    {% if carte.stoc == 0 %}
+        <p class="indisponibil-text" style="color:red;">Indisponibil</p>
+    {% endif %}
+    <button class="add-to-cart" data-id="{{ carte.id_carte }}" data-stoc="{{ carte.stoc }}">Adauga in cos</button>
+    <div class="cart-controls" data-id="{{ carte.id_carte }}" data-stoc="{{ carte.stoc }}"> 
+      <button class="minus">-</button> 
+      <input type="number" class="qty" min="0" max="{{ carte.stoc }}" value="0"> 
+      <button class="plus">+</button> 
+    </div>
+    <button class="remove-from-cart" data-id="{{ carte.id_carte }}"> 🗑️ Sterge produsul </button>
+    <span class="in-cos" style="display:none; color:green; font-weight:bold;">
+        In cos
+    </span>
+    {% comment %} <p class="warning" style="display:none; color:red; font-weight:bold;"></p> {% endcomment %}
+
+    <p><strong>Descriere:</strong> {{ carte.descriere }}</p>
+    <p><strong>Editura:</strong> {{ carte.id_editura.nume_editura }}</p>
+    <p><strong>Data publicării:</strong> {{ carte.data_publicarii }}</p>
+    <p><strong>Format:</strong> {{ carte.format }}</p>
+    <p><strong>Limba:</strong> {{ carte.get_limba_display }}</p>
+
+    <p><strong>Categorii:</strong></p>
+    <ul>
+      {% for cat in carte.categorii.all %}
+        <li><a href="{% url 'detalii_categorie' cat.nume %}"
+                style="color: {{ cat.culoare }};">
+                <i class="fa {{ cat.icon }}"></i> {{ cat.nume }}
+            </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<script>
+function getCart() {
+    return JSON.parse(localStorage.getItem("cos") || "{}");
+}
+function saveCart(cos) {
+    localStorage.setItem("cos", JSON.stringify(cos));
+}
+function addToCart(id, stoc) {
+    let cos = getCart();
+    if (!cos[id]) cos[id] = 0;
+    if (cos[id] + 1 > stoc) {
+        alert("Nu poți adăuga mai multe produse decât stocul disponibil!");
+        return;
+    }
+    cos[id] += 1;
+    saveCart(cos);
+    markInCart(id);
+}
+function markInCart(id) {
+    let el = document.querySelector(`[data-id='${id}'] ~ .in-cos`);
+    if (el) el.style.display = "inline";
+}
+
+function updateQty(id, qty, stoc) { 
+  let cos = getCart(); 
+  if (qty <= 0) { 
+    delete cos[id]; 
+    saveCart(cos); 
+    document.querySelector(`[data-id='${id}'] .qty`).value = 0; 
+    document.querySelector(`[data-id='${id}'] ~ .in-cos`).style.display = "none"; 
+    return; 
+  } 
+  if (qty > stoc) { 
+    alert("Cantitatea depășește stocul disponibil!"); 
+    /*let warning = document.querySelector(`[data-id='${id}'] .warning`); 
+    if (warning) { 
+      warning.textContent = "Nu poți adăuga mai multe produse decât stocul disponibil!"; 
+      warning.style.display = "block"; 
+    } */
+    return; 
+  } 
+  cos[id] = qty; 
+  saveCart(cos); 
+  document.querySelector(`[data-id='${id}'] .qty`).value = qty; 
+  document.querySelector(`[data-id='${id}'] ~ .in-cos`).style.display = "inline"; 
+}
+
+function removeFromCart(id) {
+    let cos = getCart();
+    if (cos[id]) {
+        delete cos[id];
+        saveCart(cos);
+
+        let qtyInput = document.querySelector(`[data-id='${id}'] .qty`);
+        if (qtyInput) qtyInput.value = 0;
+
+        let inCos = document.querySelector(`[data-id='${id}'] ~ .in-cos`);
+        if (inCos) inCos.style.display = "none";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".add-to-cart").forEach(btn => {
+        btn.addEventListener("click", function() {
+            //addToCart(this.dataset.id, parseInt(this.dataset.stoc));
+            let id = this.dataset.id; 
+            let stoc = parseInt(this.dataset.stoc); 
+            addToCart(id, 1); 
+            let ctrl = document.querySelector(`.cart-controls[data-id="${id}"]`); 
+            if (ctrl) { 
+              let qtyInput = ctrl.querySelector(".qty"); 
+              qtyInput.value = 1; 
+            }
+        });
+    });
+    document.querySelectorAll(".cart-controls").forEach(ctrl => { 
+      let id = ctrl.dataset.id; 
+      let stoc = parseInt(ctrl.dataset.stoc); 
+      let qtyInput = ctrl.querySelector(".qty"); // initializează inputul cu valoarea din coș 
+      
+      let cos = getCart(); 
+      if (cos[id]) { 
+        qtyInput.value = cos[id]; 
+        ctrl.nextElementSibling.style.display = "inline"; // afișează "În coș" 
+      } // buton + 
+      ctrl.querySelector(".plus").onclick = () => { 
+        let current = parseInt(qtyInput.value) || 0; 
+        updateQty(id, current + 1, stoc); 
+      }; // buton - 
+      ctrl.querySelector(".minus").onclick = () => { 
+        let current = parseInt(qtyInput.value) || 0; 
+        updateQty(id, current - 1, stoc); 
+      }; // input direct 
+      qtyInput.onchange = (e) => { 
+        let value = parseInt(e.target.value); 
+        updateQty(id, value, stoc); 
+      }; 
+    });
+    document.querySelectorAll(".remove-from-cart").forEach(btn => { 
+      btn.addEventListener("click", function() { 
+        removeFromCart(this.dataset.id); 
+      }); 
+    });
+
+    let cos = getCart();
+    for (let id in cos) {
+        markInCart(id);
+    }
+});
+</script>
+
+{% endblock %}

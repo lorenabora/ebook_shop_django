@@ -1,0 +1,17 @@
+{% extends "./baza.html" %}
+{%load static%}
+{% block title %}Pagina principala{% endblock %}
+
+{% block content %}
+<h1>Pagina principala</h1>
+{% comment %} <p>paragraf</p> {% endcomment %}
+{% comment %} <p>parametru: {{param}}</p> {% endcomment %}
+<div class="aboutus1">
+    <img src={%static 'app_eBooks/imagini/vrl_read.jpg'%} id="virtual" alt="imagine"/>
+    <p class="para">Pentru iubitorii de lectura care isi doresc confortul de a purta asupra lor o poveste oriunde, oricum si oricand. <br><br>Acest site este destinat vanzarii de carti in format electronic( eBooks). In cateva minute dupa plasarea comenzii si finalizarea 
+    platii, clientii isi pot descarca pachetul pe orice dispozitiv, pentru o lectura in orice moment.<p>
+</div>
+<section id="intro"></section>
+<section id="beneficii"></section>
+<section id="Top_10"></section>
+{% endblock %}

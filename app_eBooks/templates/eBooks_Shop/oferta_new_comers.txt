@@ -1,0 +1,15 @@
+Subiect: {{ subiect }}
+
+Salut!
+
+Cu ocazia deschiderii magazinului, va invitam sa va bucurati de oferta {{nume}}.
+Promotia va cuprinde categoriile: {{ categorii }}.
+Reducerile ajung până la {{ discount }}%.
+
+Promoția expiră la data: {{ end_date }}
+
+Detalii:
+{{ detalii }}
+
+Accesează pagina promoției: {{ url_promotie }}
+Mulțumim!

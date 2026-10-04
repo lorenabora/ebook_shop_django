@@ -1,0 +1,52 @@
+{% extends "./baza.html" %}
+{% load static %}
+{% block title %}Profil utilizator{% endblock %}
+{% block content %}
+<h1>Bun venit, {{ request.user.username }}</h1>
+{% if user.is_authenticated %}
+    <div id="banner-oferta" class="banner" style="display:none;">
+      Oferta reducere 50%!
+    </div>
+{% endif %}
+<div class="profil">
+  
+  <div class="profil_title">
+  <h2>Datele tale</h2></div>
+  <div class="profil-details">
+    <ul>
+      <li>Nume: {{ request.user.last_name }}</li>
+      <li>Prenume: {{ request.user.first_name }}</li>
+      <li>Email: {{ request.user.email }}</li>
+      <li>Telefon: {{ request.user.telefon }}</li>
+      <li>Data nașterii: {{ request.user.data_nasterii }}</li>
+      <li>Adresa: {{ request.user.adresa }}</li>
+      <li>Bio: {{ request.user.bio }}</li>
+    </ul>
+  </div>
+  <div class="profil-right">
+  {% if request.user.avatar %}
+    <img class="avatar" src="{{ request.user.avatar.url }}" alt="Avatar utilizator">
+  {% else %}
+    <p><em>Nu există avatar încărcat.</em></p>
+  {% endif %}
+</div>
+<div class="profil-links">
+<a href="{% url 'schimba_parola' %}">🔒Schimba parola</a>
+<a href="{% url 'logout'%}">🚪Logout</a>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // verif user daca e logat
+  var banner = document.getElementById("banner-oferta");
+  if (banner) {
+    if (Math.random()<0.3) {
+      banner.style.display = "block";
+      banner.classList.add("animatie-banner");
+      banner.addEventListener("click", function() {
+        window.location.href = "{% url 'activeaza_oferta' %}";
+      });
+    }
+  }
+});
+</script>
+{% endblock %}

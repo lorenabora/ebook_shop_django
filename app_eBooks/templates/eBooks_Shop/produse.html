@@ -1,0 +1,121 @@
+{% extends "./baza.html" %}
+{%load static%}
+{% block title %}Produse{% endblock %}
+
+{% block content %}
+<div class="page-layout">
+<form id="filterForm" method="get" class="form-filters">
+  {{ form.as_p }}
+  <div class="butoane">
+    <button type="submit" class="filtreaza">Filtrează</button>
+    <button type="button" id="resetBtn" class="reseteaza">Resetează</button>
+  </div>
+</form>
+
+
+<div id="results">
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+
+<div class="produs">
+{% comment %} <h1 id="prodtitl">Produse</h1><br> {% endcomment %}
+{% if categorie %}
+    <div class="detalii_categorie" style="color: {{ categorie.culoare }};">
+      <h1>{{ categorie.nume }}</h1>
+      <p>{{ categorie.descriere }}</p>
+      {% comment %} <p class="not_this"><strong>Subcategorii:</strong>
+        {% for subcategorie in categorie.subcategorii.all %}
+            {{ subcategorie.nume }}{{subcategorie.popularitate}}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      </p> {% endcomment %}
+    </div>
+  {% else %}
+    <h1 id="prodtitl">Produse</h1>
+{% endif %} <br>
+<ul>
+  {% with sorted_list=page_obj|dictsort:"stoc" %}
+  {% with temp=sorted_list|slice:"::-1" %}
+  {% for carte in temp %}
+    <li class="{% if carte.stoc == 0 %}indisponibil{% endif %}">
+      {% if carte.imagine %}
+        <img class="coperta" src="{{ carte.imagine.url }}" alt="{{ carte.titlu }}">
+      {% else %}
+        <p><em>Nu există imagine disponibilă.</em></p>
+      {% endif %}
+      <a href="{% url 'detalii_carte' carte.id_carte %}">{{ carte.titlu }}</a> 
+      {%for aut in carte.autor.all%}
+        {{aut.prenume}} {{aut.nume}}
+      {%endfor%}<br>
+      {{ carte.pret }} lei<br>
+      <p>Stoc: <span class="stoc">{{ carte.stoc }}</span></p><br>
+      {% if carte.stoc == 0 %} <p class="indisponibil-text">Indisponibil</p> {% endif %}
+      {% comment %} <button class="add-to-cart"
+              data-id="{{ carte.id_carte }}"
+              data-stoc="{{ carte.stoc }}">
+          Adauga in cos
+      </button>
+      <span class="in-cos" style="display:none; color:green; font-weight:bold;">
+          In cos
+      </span> {% endcomment %}
+      Categorii:
+      {% for cat in carte.categorii.all %}
+        <a href="{% url 'detalii_categorie' cat.nume %}"
+            style="color: {{ cat.culoare }};">
+            <i class="fa {{ cat.icon }}"></i> {{ cat.nume }}
+        </a>{% if not forloop.last %} {% endif %}
+      {% endfor %}
+    </li>
+  {% empty %}
+    <p><em>Nu a fost găsit niciun produs.</em></p>
+  {% endfor %}
+  {% endwith %}
+  {% endwith %}
+</ul>
+</div>
+</div>
+</div>
+<div class="pag">
+  {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">← Back</a>
+  {% endif %}
+  <span>{{ page_obj.number }} din {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Next →</a>
+  {% endif %}
+</div>
+
+
+
+<script>
+document.getElementById("filterForm").addEventListener("submit", function(e) {
+  e.preventDefault(); // previn reload
+  const formData = new FormData(this);
+  fetch("{% url 'produse' %}?" + new URLSearchParams(formData), {
+    method: "GET"
+  })
+  .then(response => response.text())
+  .then(html => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const newResults = doc.querySelector("#results");
+    const newMessages = doc.querySelector(".messages");
+    document.getElementById("results").innerHTML = newResults.innerHTML;
+    document.querySelector(".messages").innerHTML = newMessages ? newMessages.innerHTML : "";
+  });
+});
+// reset button with confirmation
+document.getElementById("resetBtn").addEventListener("click", function() {
+  if (confirm("Atenție: vei pierde filtrele deja puse. Vrei să continui?")) {
+    document.getElementById("filterForm").reset();
+    document.getElementById("filterForm").dispatchEvent(new Event("submit"));
+  }
+});
+</script>
+
+{% endblock %}

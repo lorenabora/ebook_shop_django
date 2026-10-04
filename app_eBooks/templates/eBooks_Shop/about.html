@@ -1,0 +1,15 @@
+{% extends "./baza.html" %}
+{%load static%}
+{% block title %}Despre{% endblock %}
+
+{% block content %}
+<h1 style="color:gold">Despre</h1>
+<div class="aboutus1">
+    <p class="shortCap">Acest site este destinat tuturor iubitorilor de povesti care doresc sa aiba alaturi o carte buna in orice clipa. Site-ul nostru va ofera cele mai noi carti, din diverse domenii, pentru a multumi orice client. Avem o gama larga si variata, iar de anul acesta ne putem mandri cu integrarea cartilor audio in stocurile noastre.</p>
+    <img id="virtual" src={%static 'app_eBooks/imagini/virtual_books.png'%} alt="imagine"/>
+    <p class="shortCap">Usor, rapid si mereu la indemana. Lectura placuta!</p>
+</div>
+<section id="istoric"></section>
+<section id="echipa"></section>
+<section id="prezent"></section>
+{% endblock %}

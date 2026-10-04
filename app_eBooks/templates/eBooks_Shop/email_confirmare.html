@@ -1,0 +1,18 @@
+{% extends "./baza.html" %}
+{% load static %}
+{% block title %}Email de confirmare{% endblock %}
+{% block content %}
+<h1>Bun venit, {{ user.username }}</h1>
+<div class="profil">
+  <h2>Datele tale</h2>
+  <ul>
+    <li>Nume: {{ user.last_name }}</li>
+    <li>Prenume: {{ user.first_name }}</li>
+    <li>Username: {{ user.username }}</li>
+  </ul>
+  <p>Ne bucuram ca ai decis sa ni te alaturi epe cel mai nou magazin online de eBooks.</p>
+  <p>Pentru a va coninua cumparaturile, va rugam ca mai intai sa va confirmati adresa de mail, accesand linkul de mai jos:</p>
+  <a href="{{ confirm_link }}">Confirma emailul</a>
+  <br><img src="{{ url_imagine }}" alt="icon">
+</div>
+{% endblock %}

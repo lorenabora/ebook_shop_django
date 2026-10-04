@@ -1,0 +1,10 @@
+body{
+    background-color: rgb(91, 26, 241);
+    color:rgb(213, 255, 234);
+    text-align: left;
+    align-items: flex-start;
+}
+#cv{
+    background-color: rgb(91, 26, 241);
+    color:rgb(213, 255, 234);
+}

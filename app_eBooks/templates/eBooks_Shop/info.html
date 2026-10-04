@@ -1,0 +1,18 @@
+{% extends "./Abaza.html" %}
+{%load static%}
+{% block title %}INFO{% endblock %}
+
+{% block content %}
+<h1 id="cv">Info</h1>
+{% if data_html %}
+        {{ data_html|safe }}
+    {% endif %}
+
+    <section><b>Parametrii</b></section>
+    <p>Număr de parametri: {{ parametri|length }}</p>
+    <ul>
+        {% for nume in parametri %}
+            <li>{{ nume }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

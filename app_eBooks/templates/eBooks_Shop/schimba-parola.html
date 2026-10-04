@@ -1,0 +1,11 @@
+{% extends "./baza.html" %}
+{% load static %}
+{% block title %}Profil utilizator{% endblock %}
+{% block content %}
+<h2>Schimbă parola</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Salveaza</button>
+</form>
+{% endblock %}

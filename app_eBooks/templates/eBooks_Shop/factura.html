@@ -1,0 +1,171 @@
+{% comment %} <!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f3f6fb; color: #1f2937; }
+    .invoice { background: #ffffff; border-radius: 12px; padding: 24px; border: 1px solid #e5e7eb; }
+    h1 { text-align: center; color: #1e3a8a; text-decoration: underline; margin: 0 0 10px; }
+    .meta, .contact { margin-top: 10px; }
+    .meta strong, .contact strong { color: #111827; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #e5e7eb; padding: 10px; text-align: left; }
+    th { background: #1e3a8a; color: #ffffff; }
+    tr:nth-child(even) td { background: #f9fafb; }
+    .totals { margin-top: 20px; font-weight: bold; }
+    a { color: #2563eb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="invoice">
+    <h1>Factura</h1>
+
+    <div class="meta">
+      <p><strong>Data comenzii:</strong> {{ comanda.data }}</p>
+      <p><strong>Client:</strong> {{ comanda.utilizator.first_name }} {{ comanda.utilizator.last_name }} ({{ comanda.utilizator.email }})</p>
+    </div>
+
+    <div class="contact">
+      <p><strong>Contact administrator:</strong> {{ admin_email }}</p>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Produs</th>
+          <th>Link</th>
+          <th>Cantitate</th>
+          <th>Pret unitar</th>
+          <th>TVA (21%)<th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in produse_list %}
+        <tr>
+          <td>{{ item.titlu }}</td>
+          <td><a href="{{ item.url }}">Pagina produsului</a></td>
+          <td>{{ item.cantitate }}</td>
+          <td>{{ item.pret_unitar|floatformat:2 }} lei</td>
+          <td></td>
+          <td>{{ item.subtotal|floatformat:2 }} lei</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="totals">
+      <p>Total produse cumparate: {{ total_cantitate }}</p>
+      <p>Pret final: {{ total_pret|floatformat:2 }} lei</p>
+    </div>
+  </div>
+</body>
+</html> {% endcomment %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: Arial, sans-serif; color: #000000; margin: 40px; background: #ffffff; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    .logo img { height: 80px; }
+    .logo h2 { margin: 0; color: #1e3a8a; }
+    .factura-info { text-align: right; font-size: 14px; }
+    .section { margin-bottom: 20px; }
+    .section h3 { margin-bottom: 10px; color: #1e3a8a; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+    .section p { margin: 4px 0; }
+    table { 
+      width: 90%; 
+      margin: 0 auto; 
+      border-collapse: collapse; 
+      font-size: 12px; 
+      table-layout: fixed; 
+      word-wrap: break-word; 
+    }
+    th, td { 
+      border: 1px solid #000000; 
+      padding: 1px; 
+      text-align: left; 
+    }
+    th { 
+      background: #333333; 
+      color: #ffffff; 
+      text-align: center;
+    }
+    .totals { margin-top: 20px; font-weight: bold; font-size: 15px; text-align: right; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="logo">
+      <img src="C:\Users\boral\Desktop\Django\app_eBooks\static\app_eBooks\imagini\icon.png" alt="Logo eBooks Shop">
+    </div>
+    <h1>Factura</h1>
+    <div class="factura-info">
+      <p><strong>Seria:</strong> {{ serie }}</p>
+      <p><strong>Nr. factura:</strong> {{ numar_factura }}</p>
+      <p><strong>Data:</strong> {{ data_factura|date:"d.m.Y" }}</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Detalii furnizor</h3>
+    <p><strong>Nume firma:</strong> eBooks Shop</p>
+    <p><strong>Cont:</strong> ROXXXXXXXXXXXXXXXXXXXXXXXX</p>
+    <p><strong>Banca:</strong> Banca XXX</p>
+    <p><strong>Sediu:</strong> Bulevardul Tudor Vladimirescu, nr 8, Bucuresti, Sector 5</p>
+    <p><strong>Telefon:</strong> 0725725777</p>
+    <p><strong>Email:</strong> {{ admin_email }}</p>
+  </div>
+
+  <div class="section">
+    <h3>Detalii client</h3>
+    <p><strong>Nume:</strong> {{ comanda.utilizator.first_name }} {{ comanda.utilizator.last_name }}</p>
+    <p><strong>Cod client:</strong> {{ comanda.utilizator.id }}</p>
+    <p><strong>Email:</strong> {{ comanda.utilizator.email }}</p>
+    <p><strong>Modalitate de plata:</strong> Card / Online</p>
+  </div>
+
+  <div class="section">
+    <h3>Produse cumparate</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Nr. crt.</th>
+          <th>Produs</th>
+          <th>Link</th>
+          <th>Cantitate</th>
+          <th>Pret unitar (fara TVA)</th>
+          <th>TVA (5%)</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in produse_list %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ item.titlu }}</td>
+          <td><a href="{{ item.url }}">Pagina produsului</a></td>
+          <td>{{ item.cantitate }}</td>
+          <td>{{ item.pret_unitar|floatformat:2 }} lei</td>
+          <td>{{ item.tva_unitar|floatformat:2 }} lei</td>
+          <td>{{ item.subtotal_tva|floatformat:2 }} lei</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="totals">
+    <p>Total produse cumparate: {{ total_cantitate }}</p>
+    <p>Total fara TVA: {{ total_fara_tva|floatformat:2 }} lei</p>
+    <p>TVA (5%): {{ tva|floatformat:2 }} lei</p>
+    <p>Total cu TVA: {{ total_cu_tva|floatformat:2 }} lei</p>
+  </div>
+
+</body>
+</html>
+

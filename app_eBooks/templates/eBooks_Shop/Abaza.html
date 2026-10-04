@@ -1,0 +1,14 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}eBooks Shop{% endblock %}</title>
+        <link rel="stylesheet" href="{%static "app_eBooks/css/adm_stil.css"%}" type="text/css" />
+        <link rel="icon" type="image/png" href={%static "app_eBooks/imagini/icon.png"%}>
+    </head>
+    <body>      
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </body>
+</html>

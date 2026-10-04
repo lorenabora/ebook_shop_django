@@ -1,0 +1,47 @@
+{% extends "./Abaza.html" %}
+{%load static%}
+{% block title %}LOG{% endblock %}
+
+{% block content %}
+<h1>Log accesări</h1>
+    {% for acc in accesari_list %}
+        <p>{{ acc }}</p>
+    {% endfor %}
+
+    {% if msg %}
+        <p>{{ msg }}</p>
+    {% endif %}
+
+    {% if acc_info.nr %}
+        <p>Numărul de accesări în sesiunea curentă: {{ acc_info.nr }}</p>
+        <p>ID-uri: {{ acc_info.iduri|join:", " }}</p>
+    {% endif %}
+
+    {% if acc_info.detalii %}
+        <ul>
+        {% for det in acc_info.detalii %}
+            <li>{{ det }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if table_headers %}
+        <table border="1">
+            <tr>
+                {% for header in table_headers %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in table_data %}
+                <tr>
+                    {% for cell in row %}
+                        <td>{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    <p>Frecvent accesat: {{ most_visited }}</p>
+    <p>Rar accesat: {{ least_visited }}</p>
+{% endblock %}

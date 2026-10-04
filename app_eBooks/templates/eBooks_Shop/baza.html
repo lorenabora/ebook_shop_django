@@ -1,0 +1,129 @@
+{% comment %} <!DOCTYPE html>
+<html lang="ro">
+    <head>
+        <title>{{titlu_tab}}</title>
+    </head>
+    <body>
+        <h1>{{titlu_articol}}</h1>
+        <p>{{continut_articol}}</p>
+        {#{%tag%}...{%endtag%}#}
+        <a href="{% url 'info' %}?a=10&b=20">Informatii</a>
+    </body>
+</html> {% endcomment %}
+{%load static%}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}eBooks Shop{% endblock %}</title>
+        <link rel="stylesheet" href="{%static "app_eBooks/css/stil.css"%}" type="text/css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        <link rel="icon" type="image/png" href={%static "app_eBooks/imagini/icon.png"%}>
+    </head>
+    <body>
+        <header>
+            {% comment %} <h1>Acasa</h1> {% endcomment %}
+            <button class="hamburger" onclick="toggleMenu()">☰</button>
+            <!--before-->
+            <div class="textheader">
+                <h2 class="textantet">eBooks Shop</h2>
+            </div>
+            <div class="pozaantet" style="flex-grow: 0">
+                <img class="icon" src={%static 'app_eBooks/imagini/icon.png'%} alt="eBooksShop"></div>
+            </div></header>
+            <!--before end-->
+            {% comment %} <div class="textheader" style="flex-grow: 9">
+                <h2 class="textantet">eBooks Shop</h2> {% endcomment %}
+                {% comment %} <button class="hamburger" onclick="toggleMenu()">☰</button> {% endcomment %}
+                <nav class="mainnav" id="mainnav">
+                    <ul class="meniu">
+                        <li>
+                            <a class="active" href="{% url 'pagina_principala' %}">Pagina principală</a>
+                            <ul class="submeniu">
+                                <li><a href="{% url 'pagina_principala' %}#intro">Introducere</a></li>
+                                <li><a href="{% url 'pagina_principala' %}#beneficii">Beneficii</a></li>
+                                <li><a href="{% url 'pagina_principala' %}#Top_10">Top 10 books</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="{% url 'despre' %}">Despre</a>
+                            <ul class="submeniu">
+                                <li><a href="{% url 'despre' %}#istoric">Istoric</a></li>
+                                <li><a href="{% url 'despre' %}#echipa">Echipa</a></li>
+                                <li><a href="{% url 'despre' %}#prezent">Prezent</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="{% url 'login' %}">Login</a></li>
+                        <li><a href="{% url 'logout' %}" onclick="return confirm('Ești sigur că vrei să te deconectezi?');">Logout</a></li>
+                        <li><a href="{% url 'sign_in'%}"> Sign In</a></li>
+                        <li><a href="{% url 'contul_meu' %}">Contul Meu</a></li>
+                        <li><a href="{% url 'produse' %}">Produse</a></li>
+                        <li><a href="{% url 'oferte' %}">Oferte</a></li>
+                        <li><a href="{% url 'cos_virtual' %}">Coș virtual</a></li>
+                        <li><a href="{% url 'recenzii' %}">Recenzii</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                        {% if is_admin_site %}
+                            <li><a href="{% url 'info'%}">Info</a></li>
+                            <li><a href="{% url 'log'%}">Log</a></li>
+                        {% endif %}
+                        {% if perms.eBooks_Shop.add_carte %}
+                            <li><a href="{% url 'adauga_carte' %}">Adaugă carte</a></li>
+                        {% endif %}
+
+                        <li>
+                            <a href="#">Categorii</a>
+                            <ul class="submeniu">
+                                {% for cat in categorii %}
+                                <li>
+                                    <a href="{% url 'detalii_categorie' cat.nume %}" style="color: {{ cat.culoare }}">
+                                    <i class="fa {{ cat.icon }}"></i> {{ cat.nume }}</a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            {% comment %} </div> {% endcomment %}
+        {% comment %} </header>        {% endcomment %}
+        <main>
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% block content %}{% endblock %}
+        </main>
+        <footer>
+            <p>&copy;2025 eBooks Shop. Toate drepturile rezervate.</p>
+            <p>IP-ul clientului: {{ client_ip }}</p>
+            <div class="contact_info">
+                <div class="info_detalii">
+                    <h3>Contacteaza-ne</h3>
+                    <p><b>Tel:</b> 0725 725 777</p>
+                    <p><b>Mail:</b> ebooksshop@yahoo.com</p>
+                    <p><b>Adresa sediului:</b> nr.8, Tudor Vladimirescu Boulevard, Bucharest, Sector 5</p>
+                </div>
+                <div class="politici">
+                    <p>Politici de confidentialitate</p>
+                    <p>Politica magazinului nostru</p>
+                </div>
+            </div>
+        </footer>
+        {% comment %} <script>
+            function toggleMenu() {
+                const nav = document.getElementById("mainnav");
+                nav.classList.toggle("show");
+            }
+        </script> {% endcomment %}
+        <script>
+            const hamburger = document.querySelector(".hamburger");
+            const nav = document.querySelector(".mainnav");
+
+            hamburger.addEventListener("click", () => {
+                nav.classList.toggle("show");
+            });
+        </script>
+
+    </body>
+</html>

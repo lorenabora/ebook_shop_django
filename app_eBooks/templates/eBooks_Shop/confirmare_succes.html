@@ -1,0 +1,9 @@
+{% extends "./baza.html" %}
+{% block title %}Confirmare email{% endblock %}
+
+{% block content %}
+  <h1>Email confirmat cu succes!</h1>
+  <p>Bun venit, {{ user.first_name }} {{ user.last_name }} ({{ user.username }})!</p>
+  <p>Adresa ta de email a fost confirmată. Acum poți continua cumpărăturile pe site.</p>
+  <a href="{% url 'contul_meu' %}">Mergi la profilul tău</a>
+{% endblock %}

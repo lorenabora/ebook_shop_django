@@ -1,0 +1,188 @@
+{% extends "./baza.html" %}
+{% load static %}
+{% block title %}Cos virtual{% endblock %}
+{% block content %}
+<h1>Cosul meu</h1>
+{% comment %} <table id="cos-table" border="1" cellpadding="10">
+  <thead>
+    <tr>
+      <th>Produs</th>
+      <th>Cantitate</th>
+      <th>Preț unitar</th>
+      <th>Preț parțial</th>
+      <th>Acțiuni</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- aici intervine localStorage -->
+  </tbody>
+</table> {% endcomment %}
+<div id="cos-controls">
+  <label for="sort-select">Sorteaza dupa:</label>
+  <select id="sort-select">
+    <option value="nume">Nume</option>
+    <option value="pret">Pret</option>
+  </select>
+</div>
+
+<div id="cos-container"> <!-- aici se injectează produsele din localStorage --> </div>
+
+<div id="cos-summary">
+  <p style="text-align:center;"><strong>Total obiecte:</strong> <span id="total-items">0</span></p>
+  <p style="text-align:center;"><strong>Total de plată:</strong> <span id="total-price">0</span> lei</p>
+</div>
+<div id="cos-actions">
+    <button id="buy-btn">🛒 Cumpara</button>
+</div>
+
+<script>
+function getCart() {
+    return JSON.parse(localStorage.getItem("cos") || "{}");
+}
+
+function saveCart(cos) {
+    localStorage.setItem("cos", JSON.stringify(cos));
+}
+
+function updateQty(id, delta) { 
+    let cos = getCart(); 
+    if (!cos[id]) return; 
+    cos[id] += delta; 
+    if (cos[id] <= 0) { 
+        delete cos[id]; // dacă scade sub 1, elimină produsul 
+    } 
+    saveCart(cos); 
+    renderCart(); 
+}
+
+function removeFromCart(id) {
+    let cos = getCart();
+    if (cos[id]) {
+        delete cos[id];
+        saveCart(cos);
+        renderCart();
+    }
+}
+
+{% comment %} async function fetchProduse(ids) { 
+    let response = await fetch("/api/cos-produse/?ids=" + ids.join(",")); 
+    return await response.json(); 
+} {% endcomment %}
+{% comment %} document.addEventListener("DOMContentLoaded", ()=>{
+    fetch("/api/cos-produse/?ids="+ids.join(","))
+    .then(response=>response.json())
+    .then(produse=>{
+        console.log(produse);
+    });
+}); {% endcomment %}
+
+async function renderCart() {
+    let cos = getCart();
+    let ids = Object.keys(cos);
+    if (ids.length === 0) { 
+        //document.querySelector("#cos-table tbody").innerHTML = "<tr><td colspan='5'><em>Coșul este gol.</em></td></tr>"; 
+        document.getElementById("cos-container").innerHTML = "<p><em>Coșul este gol.</em></p>";
+        document.getElementById("total-items").textContent = 0; 
+        document.getElementById("total-price").textContent = 0; 
+        return; 
+    }
+    //let produse = await fetchProduse(ids);
+    let response = await fetch("cos_virtual/api/cos-produse/?ids=" + ids.join(",")); 
+    if (!response.ok) { console.error("Eroare la fetch:", response.status); return; }
+    let produse = await response.json();
+
+    let sortBy = document.getElementById("sort-select").value; 
+    ids.sort((a, b) => { 
+        if (sortBy === "nume") { 
+            return produse[a].titlu.localeCompare(produse[b].titlu); 
+        } 
+        else if (sortBy === "pret") { 
+            return produse[a].pret - produse[b].pret; 
+        } 
+        return 0; 
+    });
+    //let tbody = document.querySelector("#cos-table tbody");
+    //tbody.innerHTML = "";
+    let container = document.getElementById("cos-container");
+    container.innerHTML = "";
+
+    let totalItems = 0;
+    let totalPrice = 0;
+
+    for (let id of ids) {
+        let qty = cos[id];
+        let produs = produse[id]; 
+        if (!produs) continue;
+
+        let partial = (produs.pret * qty);
+        totalItems += qty;
+        totalPrice += partial;
+
+        /*let row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${produs.titlu}</td>
+            <td>${qty}</td>
+            <td>${produs.pret} lei</td>
+            <td>${partial} lei</td>
+            <td><button onclick="removeFromCart('${id}')">Șterge</button></td>
+        `;
+        tbody.appendChild(row);*/
+        let card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+        <div class="product-left">
+            <img src="${produs.imagine}" alt="Coperta" class="coperta_cos">
+            <h3 class="titlu">
+                <a href="${produs.url}" class="product-link">${produs.titlu}</a>
+            </h3>
+        </div>
+        <div class="product-right">
+            <p><strong>Cantitate:</strong> 
+                <button onclick="updateQty('${id}', -1)">−</button>
+                    ${qty}
+                <button onclick="updateQty('${id}', 1)">+</button>
+            </p>
+            <p><strong>Preț unitar:</strong> ${produs.pret} lei</p>
+            <p><strong>Preț parțial:</strong> ${partial} lei</p>
+            <button class="remove-btn" onclick="removeFromCart('${id}')">🗑️ Șterge</button>
+        </div>
+        `;
+        container.appendChild(card);
+
+    }
+
+    document.getElementById("total-items").textContent = totalItems;
+    document.getElementById("total-price").textContent = (totalPrice).toFixed(2);
+}
+
+document.getElementById("buy-btn").addEventListener("click", async () => {
+    let cos = getCart();
+    if (Object.keys(cos).length === 0) {
+        alert("Coșul este gol!");
+        return;
+    }
+
+    let response = await fetch("cos_virtual/api/cumpara/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            //"X-CSRFToken": getCookie("csrftoken") 
+        },
+        body: JSON.stringify({ cos: cos })
+    });
+
+    let result = await response.json();
+    if (result.status === "success") {
+        alert(result.message);
+        localStorage.removeItem("cos"); 
+        renderCart(); 
+    } else {
+        alert("Eroare: " + result.message);
+    }
+});
+
+document.getElementById("sort-select").addEventListener("change", renderCart);
+document.addEventListener("DOMContentLoaded", renderCart);
+</script>
+
+{% endblock%}
